@@ -1,37 +1,86 @@
 const taskService = require('../services/taskService');
 
-/**
- * Controlador encarregado de receber a requisição de criação de tarefa,
- * validar os dados vindos do cliente e acionar o serviço responsável.
- */
 const create = async (req, res) => {
-  // Extrai o título e a descrição enviados no corpo (body) da requisição
   const { title, description } = req.body;
-  
-  // O req.userId foi injetado pelo nosso authMiddleware após validar o Token JWT com sucesso!
-  const userId = req.userId; 
+  const userId = req.userId;
 
-  // Validação obrigatória: uma tarefa não pode existir sem um título
   if (!title) {
     return res.status(400).json({ error: 'O título da tarefa é obrigatório.' });
   }
 
   try {
-    // Encaminha os dados lapidados para o operário (Service) salvar no banco
     const novaTarefa = await taskService.criarTarefa(title, description, userId);
-    
-    // Retorna a resposta de sucesso com o status 201 (Created)
-    return res.status(201).json({
-      message: 'Tarefa criada com sucesso!',
-      task: novaTarefa
-    });
+    return res.status(201).json({ message: 'Tarefa criada com sucesso!', task: novaTarefa });
   } catch (error) {
-    // Caso ocorra alguma falha catastrófica no banco de dados, captura o erro aqui
     return res.status(500).json({ error: 'Erro interno ao criar tarefa.' });
   }
 };
 
-// Exporta o método de criação para ser utilizado no arquivo de rotas (taskRoutes.js)
-module.exports = {
-  create
+const list = async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    const tarefas = await taskService.listarTarefas(userId);
+    return res.status(200).json({ tasks: tarefas });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro interno ao listar tarefas.' });
+  }
 };
+
+const update = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.userId;
+  const { title, description, dueDate } = req.body;
+
+  if (!title && !description && !dueDate) {
+    return res.status(400).json({ error: 'Informe ao menos um campo para atualizar.' });
+  }
+
+  try {
+    const tarefa = await taskService.atualizarTarefa(id, userId, { title, description, dueDate });
+
+    if (!tarefa) {
+      return res.status(404).json({ error: 'Tarefa não encontrada.' });
+    }
+
+    return res.status(200).json({ message: 'Tarefa atualizada com sucesso!', task: tarefa });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro interno ao atualizar tarefa.' });
+  }
+};
+
+const complete = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.userId;
+
+  try {
+    const tarefa = await taskService.concluirTarefa(id, userId);
+
+    if (!tarefa) {
+      return res.status(404).json({ error: 'Tarefa não encontrada.' });
+    }
+
+    return res.status(200).json({ message: 'Tarefa marcada como concluída!', task: tarefa });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro interno ao concluir tarefa.' });
+  }
+};
+
+const remove = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.userId;
+
+  try {
+    const tarefa = await taskService.deletarTarefa(id, userId);
+
+    if (!tarefa) {
+      return res.status(404).json({ error: 'Tarefa não encontrada.' });
+    }
+
+    return res.status(200).json({ message: 'Tarefa deletada com sucesso!' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro interno ao deletar tarefa.' });
+  }
+};
+
+module.exports = { create, list, update, complete, remove };

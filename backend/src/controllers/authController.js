@@ -1,8 +1,7 @@
 const userService = require('../services/userService');
 const jwt = require('jsonwebtoken'); // Importa o gerador de token
 
-// Uma chave secreta para assinar o token (em produção isso fica escondido, mas vamos fixar para aprender)
-const JWT_SECRET = 'minha_chave_secreta_super_segura';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const register = async (req, res) => {
   // ... o código do register que fizemos antes continua exatamente igual aqui ...

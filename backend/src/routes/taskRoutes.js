@@ -6,4 +6,4 @@ const verificarToken = require('../middlewares/authMiddleware'); // O nosso segu
 // Rota protegida: O cliente acessa -> o guarda valida o token -> se estiver ok, o controlador cria a tarefa
 router.post('/', verificarToken, taskController.create);
 
-module.exports = { router };
+module.exports = router;

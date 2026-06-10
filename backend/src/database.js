@@ -1,12 +1,11 @@
 const { Pool } = require('pg');
 
-// Configura os dados de acesso ao banco de dados (iguais aos do docker-compose)
 const pool = new Pool({
-  user: 'meu_usuario',
-  host: 'localhost',
-  database: 'gerenciador_tarefas',
-  password: 'minha_senha_secreta',
-  port: 5432, // Porta padrão do PostgreSQL
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: Number(process.env.DB_PORT),
 });
 
 // Função auxiliar para testar a conexão

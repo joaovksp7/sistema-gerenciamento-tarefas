@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-// A mesma chave secreta que usamos para gerar o token no controlador
-const JWT_SECRET = 'minha_chave_secreta_super_segura';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const verificarToken = (req, res, next) => {
   // 1. Pegar o token que vem no cabeçalho (Header) da requisição

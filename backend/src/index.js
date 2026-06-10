@@ -1,15 +1,19 @@
+require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const { conectarBanco } = require('./database');
 const { criarTabelas } = require('./criarTabelas');
-const authRoutes = require('./routes/authRoutes'); // 1. Importa as rotas de auth
+const authRoutes = require('./routes/authRoutes');
+const taskRoutes = require('./routes/taskRoutes');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 
-// 2. Vincula as rotas ao prefixo /api/auth
 app.use('/api/auth', authRoutes);
+app.use('/api/tasks', taskRoutes);
 
 const iniciarAplicacao = async () => {
   await conectarBanco();

@@ -4,13 +4,21 @@ const jwt = require('jsonwebtoken'); // Importa o gerador de token
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const register = async (req, res) => {
-  // ... o código do register que fizemos antes continua exatamente igual aqui ...
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) return res.status(400).json({ error: 'Por favor, preencha todos os campos.' });
+  const { name, email, password, username } = req.body;
+  if (!name || !email || !password || !username)
+    return res.status(400).json({ error: 'Por favor, preencha todos os campos.' });
+
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  if (!usernameRegex.test(username))
+    return res.status(400).json({ error: 'Nome de usuário inválido. Use letras, números e _ (3-20 caracteres).' });
+
   try {
-    const utilizador = await userService.registarUtilizador(name, email, password);
-    return res.status(201).json({ message: 'Utilizador registado com sucesso!', user: utilizador });
-  } catch (error) { return res.status(400).json({ error: error.message }); }
+    const utilizador = await userService.registarUtilizador(name, email, password, username);
+    const token = jwt.sign({ id: utilizador.id }, JWT_SECRET, { expiresIn: '24h' });
+    return res.status(201).json({ message: 'Utilizador registado com sucesso!', user: utilizador, token });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
 };
 
 // NOVA FUNÇÃO: Login
@@ -39,7 +47,25 @@ const login = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword)
+    return res.status(400).json({ error: 'Preencha todos os campos.' });
+
+  if (newPassword.length < 6)
+    return res.status(400).json({ error: 'A nova senha deve ter pelo menos 6 caracteres.' });
+
+  try {
+    await userService.alterarSenha(req.userId, currentPassword, newPassword);
+    return res.status(200).json({ message: 'Senha alterada com sucesso!' });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   register,
-  login // Não esqueça de exportar o login
+  login,
+  changePassword,
 };

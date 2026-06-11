@@ -2,8 +2,8 @@ import api from './api';
 import type { AuthResponse, User } from '../types';
 
 export const authService = {
-  async register(name: string, email: string, password: string): Promise<AuthResponse> {
-    const { data } = await api.post<AuthResponse>('/auth/register', { name, email, password });
+  async register(name: string, email: string, password: string, username: string): Promise<AuthResponse> {
+    const { data } = await api.post<AuthResponse>('/auth/register', { name, email, password, username });
     return data;
   },
 

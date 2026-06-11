@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const verificarToken = require('../middlewares/authMiddleware');
 
 router.post('/register', authController.register);
-router.post('/login', authController.login); // Nova rota de login adicionada!
+router.post('/login', authController.login);
+router.patch('/change-password', verificarToken, authController.changePassword);
 
 module.exports = router;

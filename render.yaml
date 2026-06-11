@@ -2,7 +2,6 @@ services:
   - type: web
     name: bahtech-backend
     env: node
-    plan: free
     region: oregon
     rootDir: backend
     buildCommand: npm install
@@ -37,7 +36,6 @@ services:
   - type: web
     name: bahtech-frontend
     env: static
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist

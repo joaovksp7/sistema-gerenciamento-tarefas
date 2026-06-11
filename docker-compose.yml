@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: tasks_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-meu_usuario}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-minha_senha_secreta}
+      POSTGRES_DB: ${DB_NAME:-gerenciador_tarefas}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-meu_usuario}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: tasks_backend
+    environment:
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:-chave_secreta_docker}
+      DB_HOST: postgres
+      DB_USER: ${DB_USER:-meu_usuario}
+      DB_PASSWORD: ${DB_PASSWORD:-minha_senha_secreta}
+      DB_NAME: ${DB_NAME:-gerenciador_tarefas}
+      DB_PORT: 5432
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:3000/api
+    container_name: tasks_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -16,6 +16,7 @@ export interface Message {
   originalName?: string;
   mimetype?: string;
   size?: number;
+  url?: string;
   createdAt: string;
 }
 
@@ -60,6 +61,7 @@ export interface Attachment {
   originalName: string;
   mimetype: string;
   size: number;
+  url?: string;
   createdAt: string;
 }
 

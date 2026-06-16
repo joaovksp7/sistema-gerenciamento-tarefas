@@ -1,4 +1,11 @@
+const path = require('path');
 const chatService = require('../chat/chatService');
+const storageService = require('../services/storageService');
+
+const gerarKey = (originalname) => {
+  const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+  return 'chat/' + unique + path.extname(originalname);
+};
 
 const getConversations = async (req, res) => {
   try {
@@ -49,11 +56,13 @@ const getMessages = async (req, res) => {
 
 const uploadMessage = async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
+  const key = gerarKey(req.file.originalname);
   try {
+    await storageService.enviarArquivo(req.file.buffer, key, req.file.mimetype);
     const type = req.body.type || (req.file.mimetype.startsWith('image/') ? 'image' : req.file.mimetype.startsWith('audio/') ? 'audio' : 'file');
     const message = await chatService.salvarMensagem(req.params.id, req.userId, {
       type,
-      filename: req.file.filename,
+      filename: key,
       originalName: req.file.originalname,
       mimetype: req.file.mimetype,
       size: req.file.size,
@@ -61,6 +70,7 @@ const uploadMessage = async (req, res) => {
     req.io.to(`conv:${req.params.id}`).emit('receive_message', message);
     return res.status(201).json({ message });
   } catch (error) {
+    await storageService.removerArquivo(key).catch(() => {});
     return res.status(500).json({ error: error.message });
   }
 };

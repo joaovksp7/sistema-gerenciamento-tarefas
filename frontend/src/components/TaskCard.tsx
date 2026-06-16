@@ -10,9 +10,6 @@ interface TaskCardProps {
   onDelete: (id: string) => void;
 }
 
-const UPLOADS_BASE = ((import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:3000/api')
-  .replace(/\/api$/, '') + '/uploads';
-
 export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) {
   const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -126,16 +123,16 @@ export function TaskCard({ task, onComplete, onEdit, onDelete }: TaskCardProps) 
               {attachments.map((att) => (
                 <div key={att.id} className="relative group">
                   {att.mimetype.startsWith('image/') ? (
-                    <a href={`${UPLOADS_BASE}/${att.filename}`} target="_blank" rel="noopener noreferrer">
+                    <a href={att.url} target="_blank" rel="noopener noreferrer">
                       <img
-                        src={`${UPLOADS_BASE}/${att.filename}`}
+                        src={att.url}
                         alt={att.originalName}
                         className="w-14 h-14 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
                       />
                     </a>
                   ) : (
                     <a
-                      href={`${UPLOADS_BASE}/${att.filename}`}
+                      href={att.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 px-2 py-1.5 rounded-lg max-w-36"

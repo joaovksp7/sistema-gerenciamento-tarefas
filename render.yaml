@@ -33,6 +33,16 @@ services:
         fromDatabase:
           name: bahtech-db
           property: port
+      - key: R2_ENDPOINT
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        sync: false
+      - key: R2_PUBLIC_URL
+        sync: false
 
   - type: web
     name: bahtech-frontend

@@ -1,17 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
 const verificarToken = require('../middlewares/authMiddleware');
 const chatController = require('../controllers/chatController');
 
-const storage = multer.diskStorage({
-  destination: path.join(__dirname, '../../uploads'),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
-  },
-});
+const storage = multer.memoryStorage();
 
 const allowedMimes = [
   'image/jpeg', 'image/png', 'image/gif', 'image/webp',

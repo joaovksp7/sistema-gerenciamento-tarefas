@@ -1,6 +1,5 @@
 require('dotenv').config();
 const http = require('http');
-const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
@@ -17,7 +16,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 const server = http.createServer(app);
 const io = setupSocket(server);

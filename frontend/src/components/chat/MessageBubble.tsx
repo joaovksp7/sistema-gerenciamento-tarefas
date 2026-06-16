@@ -1,9 +1,6 @@
 import type { Message } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 
-const UPLOADS_BASE = ((import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:3000/api')
-  .replace(/\/api$/, '') + '/uploads';
-
 interface MessageBubbleProps {
   message: Message;
   isOwn: boolean;
@@ -20,9 +17,9 @@ export function MessageBubble({ message, isOwn, showSender }: MessageBubbleProps
   const renderContent = () => {
     if (message.type === 'image' && message.filename) {
       return (
-        <a href={`${UPLOADS_BASE}/${message.filename}`} target="_blank" rel="noopener noreferrer">
+        <a href={message.url} target="_blank" rel="noopener noreferrer">
           <img
-            src={`${UPLOADS_BASE}/${message.filename}`}
+            src={message.url}
             alt={message.originalName || t.chat.imageMessage}
             className="max-w-48 max-h-48 rounded-lg object-cover"
           />
@@ -33,7 +30,7 @@ export function MessageBubble({ message, isOwn, showSender }: MessageBubbleProps
     if (message.type === 'audio' && message.filename) {
       return (
         <audio controls className="max-w-56 h-10">
-          <source src={`${UPLOADS_BASE}/${message.filename}`} type={message.mimetype} />
+          <source src={message.url} type={message.mimetype} />
         </audio>
       );
     }
@@ -41,7 +38,7 @@ export function MessageBubble({ message, isOwn, showSender }: MessageBubbleProps
     if (message.type === 'file' && message.filename) {
       return (
         <a
-          href={`${UPLOADS_BASE}/${message.filename}`}
+          href={message.url}
           target="_blank"
           rel="noopener noreferrer"
           className={`flex items-center gap-2 underline text-sm ${isOwn ? 'text-blue-100' : 'text-blue-600 dark:text-blue-400'}`}

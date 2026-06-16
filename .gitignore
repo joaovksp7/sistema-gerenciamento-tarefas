@@ -4,3 +4,6 @@ dist/
 *.local
 .DS_Store
 coverage/
+backend/node_modules/
+frontend/node_modules/
+CONTEXTO_PROJETO.md

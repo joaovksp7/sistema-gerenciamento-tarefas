@@ -1,4 +1,7 @@
 const { pool } = require('../database');
+const storageService = require('../services/storageService');
+
+const comUrl = (msg) => ({ ...msg, url: storageService.urlPublica(msg.filename) });
 
 const criarConversaDireta = async (userId1, userId2) => {
   const existing = await pool.query(`
@@ -87,7 +90,7 @@ const buscarMensagens = async (conversationId, userId, limit = 50) => {
      ORDER BY "createdAt" ASC LIMIT $2`,
     [conversationId, limit]
   );
-  return resultado.rows;
+  return resultado.rows.map(comUrl);
 };
 
 const salvarMensagem = async (conversationId, senderId, { content, type = 'text', filename, originalName, mimetype, size }) => {
@@ -109,7 +112,7 @@ const salvarMensagem = async (conversationId, senderId, { content, type = 'text'
     [conversationId, senderId, senderName, type, content || null,
       filename || null, originalName || null, mimetype || null, size || null]
   );
-  return resultado.rows[0];
+  return comUrl(resultado.rows[0]);
 };
 
 const buscarUsuarioPorUsername = async (query) => {

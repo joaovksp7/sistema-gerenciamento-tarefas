@@ -1,4 +1,7 @@
 const { pool } = require('../database');
+const storageService = require('./storageService');
+
+const comUrl = (anexo) => ({ ...anexo, url: storageService.urlPublica(anexo.filename) });
 
 const verificarPropriedadeTarefa = async (taskId, userId) => {
   const resultado = await pool.query(
@@ -8,7 +11,7 @@ const verificarPropriedadeTarefa = async (taskId, userId) => {
   if (!resultado.rows[0]) throw new Error('Tarefa não encontrada.');
 };
 
-const salvarAnexo = async (taskId, userId, file) => {
+const salvarAnexo = async (taskId, userId, file, key) => {
   await verificarPropriedadeTarefa(taskId, userId);
   const query = `
     INSERT INTO task_attachments ("taskId", filename, "originalName", mimetype, size)
@@ -16,9 +19,9 @@ const salvarAnexo = async (taskId, userId, file) => {
     RETURNING id, "taskId", filename, "originalName", mimetype, size, "createdAt";
   `;
   const resultado = await pool.query(query, [
-    taskId, file.filename, file.originalname, file.mimetype, file.size,
+    taskId, key, file.originalname, file.mimetype, file.size,
   ]);
-  return resultado.rows[0];
+  return comUrl(resultado.rows[0]);
 };
 
 const listarAnexos = async (taskId, userId) => {
@@ -30,7 +33,7 @@ const listarAnexos = async (taskId, userId) => {
     ORDER BY "createdAt" ASC;
   `;
   const resultado = await pool.query(query, [taskId]);
-  return resultado.rows;
+  return resultado.rows.map(comUrl);
 };
 
 const removerAnexo = async (attachmentId, taskId, userId) => {
